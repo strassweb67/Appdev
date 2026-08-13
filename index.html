@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>LEO.AI Service PRO</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* ── ROOT VARIABLES ── */
+:root{
+  --glass-bg:rgba(8,8,16,0.75);
+  --glass-border:rgba(255,255,255,0.09);
+  --glass-blur:blur(52px) saturate(200%);
+  --glass-shadow:0 8px 40px rgba(0,0,0,.7),0 2px 8px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(255,255,255,0.02);
+  --accent:#3b82f6;
+  --accent-glow:rgba(59,130,246,0.35);
+  --ink:#f1f5f9;
+  --ink-soft:rgba(241,245,249,0.6);
+  --ink-muted:rgba(241,245,249,0.32);
+  --r-xl:28px;
+  --r-2xl:36px;
+}
+
+/* ── RESET & BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:#000;color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── ANIMATIONS ── */
+/* FIX : floatFood réduit à 8px, sans rotation — plus stable sur mobile */
+@keyframes floatFood{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes floatKnife{0%{transform:translateY(100vh) rotateZ(15deg) rotateX(20deg);opacity:.04}50%{opacity:.12}100%{transform:translateY(-100vh) rotateZ(15deg) rotateX(20deg);opacity:.04}}
+@keyframes floatFork{0%{transform:translateY(100vh) rotateZ(-10deg) rotateX(-15deg);opacity:.05}50%{opacity:.14}100%{transform:translateY(-100vh) rotateZ(-10deg) rotateX(-15deg);opacity:.05}}
+@keyframes floatSpoon{0%{transform:translateY(100vh) rotateZ(25deg) rotateX(10deg);opacity:.06}50%{opacity:.13}100%{transform:translateY(-100vh) rotateZ(25deg) rotateX(10deg);opacity:.06}}
+@keyframes bf{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.08)}66%{transform:translate(-30px,40px) scale(.95)}}
+@keyframes ambientGlow{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fl{from{transform:scaleY(1) scaleX(1)}to{transform:scaleY(1.15) scaleX(.9)}}
+@keyframes stm{0%{opacity:.4;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(1.5)}}
+@keyframes tilt{0%,100%{transform:rotateY(0) rotateX(8deg)}50%{transform:rotateY(10deg) rotateX(4deg)}}
+@keyframes run{0%{left:-80px}100%{left:110%}}
+@keyframes wlk{from{transform:rotate(-25deg)}to{transform:rotate(25deg)}}
+@keyframes urge{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.4)}50%{box-shadow:0 0 0 10px rgba(249,115,22,0)}}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+@keyframes fi{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes navSlideIn{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
+@keyframes dotPulse{0%,100%{opacity:1;box-shadow:0 0 8px rgba(34,197,94,0.6)}50%{opacity:.6;box-shadow:0 0 14px rgba(34,197,94,0.9)}}
+@keyframes btnPulse{0%,100%{box-shadow:0 8px 30px rgba(37,99,235,.4),0 0 0 0 rgba(59,130,246,.4)}50%{box-shadow:0 8px 30px rgba(37,99,235,.4),0 0 0 8px rgba(59,130,246,0)}}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes sp{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes loaderSpin{to{transform:rotate(360deg)}}
+
+/* ── BACKGROUND ── */
+#bgDecor{position:fixed;inset:0;z-index:-10;pointer-events:none;overflow:hidden;background:radial-gradient(circle at 25% 20%,rgba(30,40,80,.35) 0%,transparent 55%),radial-gradient(circle at 75% 80%,rgba(20,30,70,.25) 0%,transparent 50%)}
+#bgDecor::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(59,130,246,.03) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(59,130,246,.02) 0%,transparent 50%);animation:ambientGlow 8s ease-in-out infinite}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.16;will-change:transform}
+.blob.b1{width:520px;height:520px;background:#ef4444;top:-8%;right:-6%;animation:bf 18s ease-in-out infinite}
+.blob.b2{width:440px;height:440px;background:#3b82f6;bottom:-10%;left:-8%;animation:bf 22s ease-in-out infinite reverse}
+.blob.b3{width:360px;height:360px;background:#dc2626;top:35%;left:35%;opacity:.09;animation:bf 26s ease-in-out infinite}
+
+/* ── UTENSILS ── */
+.utensil{position:fixed;z-index:-8;opacity:.08;pointer-events:none;filter:drop-shadow(0 8px 12px rgba(59,130,246,.2))}
+.knife{animation:floatKnife 12s linear infinite;width:40px;height:120px}
+.fork{animation:floatFork 14s linear infinite;width:35px;height:115px}
+.spoon{animation:floatSpoon 13s linear infinite;width:38px;height:110px}
+
+/* ── GLASS CARD ── */
+.glass-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--r-xl);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);position:relative;overflow:hidden;color:var(--ink);transition:transform .4s cubic-bezier(.4,0,.2,1),box-shadow .4s cubic-bezier(.4,0,.2,1),border-color .4s ease}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 8%,rgba(255,255,255,.14) 28%,rgba(255,255,255,.24) 50%,rgba(255,255,255,.14) 72%,transparent 92%);pointer-events:none}
+.glass-card::after{content:'';position:absolute;top:0;left:0;width:1px;height:100%;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 35%,transparent 65%,rgba(255,255,255,.04));pointer-events:none}
+.glass-card:hover{transform:translateY(-5px) scale(1.015);border-color:rgba(99,102,241,.22);box-shadow:0 28px 70px rgba(0,0,0,.75),0 6px 18px rgba(0,0,0,.5),0 0 0 1px rgba(99,102,241,.12),inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(255,255,255,.03),0 0 50px rgba(59,130,246,.07)}
+.dark-card{background:rgba(12,12,26,.82);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 24px rgba(0,0,0,.40)}
+
+/* ── HEADER PILL ── */
+.header-pill{position:relative;display:flex;align-items:center;justify-content:space-between;padding:10px 14px 10px 18px;border-radius:24px;background:rgba(10,10,22,0.92);backdrop-filter:blur(48px) saturate(200%);-webkit-backdrop-filter:blur(48px) saturate(200%);border:1px solid rgba(255,255,255,0.09);box-shadow:0 2px 0 rgba(255,255,255,.06) inset,0 12px 36px rgba(0,0,0,.55),0 4px 12px rgba(0,0,0,.35);margin:6px auto 20px;max-width:560px;overflow:hidden}
+.header-pill::before{content:'';position:absolute;top:0;left:14%;right:14%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);pointer-events:none}
+.header-pill::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.04) 0%,transparent 45%)}
+.header-pill>*{position:relative;z-index:1}
+
+/* ── BUTTONS ── */
+.btn-neo{background:rgba(255,255,255,.07);color:#fff;padding:14px 28px;border-radius:16px;font-weight:700;font-size:14px;letter-spacing:.5px;cursor:pointer;border:1px solid rgba(255,255,255,.11);font-family:inherit;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:0 8px 24px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.09);display:inline-flex;align-items:center;justify-content:center;gap:8px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);text-decoration:none}
+.btn-neo:hover{background:rgba(59,130,246,.22);border-color:rgba(59,130,246,.4);transform:translateY(-2px);box-shadow:0 16px 40px rgba(59,130,246,.3),inset 0 1px 0 rgba(255,255,255,.12)}
+.btn-neo:active{transform:translateY(0)}
+.btn-neo.big{padding:20px 40px;font-size:16px;border-radius:22px}
+.btn-neo.ghost{background:rgba(255,255,255,.05);color:var(--ink);border:1px solid rgba(255,255,255,.09);box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.btn-neo.ghost:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:#fff}
+.btn-blue{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border-color:rgba(59,130,246,.5);box-shadow:0 8px 28px rgba(37,99,235,.45),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn-blue:hover{background:linear-gradient(135deg,#60a5fa 0%,#3b82f6 100%);box-shadow:0 18px 45px rgba(37,99,235,.6),inset 0 1px 0 rgba(255,255,255,.28);border-color:rgba(96,165,250,.6)}
+.btn-danger{background:rgba(239,68,68,.15);color:#f87171;border-color:rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.3)}
+.nav-btn{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .25s cubic-bezier(.4,0,.2,1);backdrop-filter:blur(10px)}
+.nav-btn:hover{background:rgba(59,130,246,0.2);border-color:rgba(59,130,246,0.3);transform:translateY(-2px) scale(1.05);box-shadow:0 6px 20px rgba(59,130,246,0.25)}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;padding:8px 16px 180px;animation:fi .5s ease both}
+.screen.active{display:block}
+
+/* ── NAV ── */
+.nav-frost{position:fixed;top:0;left:0;right:0;z-index:50;height:52px;background:rgba(6,6,14,0.95);backdrop-filter:blur(60px) saturate(220%);-webkit-backdrop-filter:blur(60px) saturate(220%);border-bottom:1px solid rgba(255,255,255,0.07);box-shadow:0 1px 0 rgba(255,255,255,0.05) inset,0 4px 30px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:space-between;padding:0 20px;animation:navSlideIn .7s cubic-bezier(.22,1,.36,1) both}
+.nav-frost::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(255,255,255,.12) 20%,rgba(255,255,255,.2) 50%,rgba(255,255,255,.12) 80%,transparent 95%)}
+
+/* ── INPUTS ── */
+.neo-input{width:100%;padding:14px 16px;background:rgba(255,255,255,.05);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;font-family:inherit;font-size:14px;font-weight:500;color:var(--ink);outline:none;transition:all .25s cubic-bezier(.4,0,.2,1);display:block}
+.neo-input:focus{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.08);box-shadow:0 0 0 4px rgba(59,130,246,.15),inset 0 1px 0 rgba(255,255,255,.06)}
+.neo-input::placeholder{color:var(--ink-muted)}
+textarea.neo-input{resize:vertical}
+
+/* ── MODAL ── */
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(4,4,10,.65);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);padding:16px}
+.modal.open{display:flex;animation:fi .3s ease both}
+.modal-card{background:rgba(8,8,18,.88);backdrop-filter:blur(52px) saturate(200%);-webkit-backdrop-filter:blur(52px) saturate(200%);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-2xl);padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 40px 80px rgba(0,0,0,.75),0 8px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(255,255,255,.04);animation:sp .4s cubic-bezier(.34,1.56,.64,1) both;position:relative;color:var(--ink)}
+.modal-close{position:absolute;top:14px;left:14px;z-index:2;cursor:pointer;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink-soft);border:1px solid rgba(255,255,255,.1);transition:all .2s}
+.modal-close:hover{background:rgba(255,255,255,.15);color:#fff}
+
+/* ── HERO SECTION ── FIX PRINCIPAL ── */
+.hero-3d-wrap{position:relative;height:340px;margin-bottom:24px;border-radius:var(--r-2xl);overflow:hidden;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 60%,#1d4ed8 100%);border:1px solid rgba(59,130,246,.4);box-shadow:0 30px 80px rgba(37,99,235,.45),inset 0 1px 0 rgba(255,255,255,.2)}
+.hero-3d-wrap .overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:linear-gradient(135deg,rgba(29,78,216,.3) 0%,rgba(37,99,235,.15) 100%)}
+
+/* FIX : Remplacement des <img> cassées par des emoji texte fixes dans le conteneur */
+.food-emoji{
+  position:absolute;
+  pointer-events:none;
+  z-index:3;
+  user-select:none;
+  will-change:transform;
+  line-height:1;
+  display:block;
+  /* Ombre pour démarquer du fond bleu */
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
+}
+.hero-title{font-family:'Playfair Display',serif;font-weight:900;line-height:1.15;letter-spacing:-.5px;text-shadow:0 2px 12px rgba(0,0,0,.3)}
+
+/* ── MENU ── */
+.plate-img{filter:drop-shadow(0 18px 18px rgba(0,0,0,.4));transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.glass-card:hover .plate-img{transform:scale(1.12) rotate(12deg)}
+.category-pill{transition:all .3s cubic-bezier(.4,0,.2,1);cursor:pointer;user-select:none;padding:10px 18px;border-radius:100px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--ink);font-family:inherit;font-size:13px;font-weight:700;white-space:nowrap}
+.category-pill.active{background:rgba(59,130,246,.25)!important;border-color:rgba(59,130,246,.5)!important;color:#fff;box-shadow:0 0 22px rgba(59,130,246,.2);transform:scale(1.06)}
+
+/* ── PROGRESS ── */
+.progress{height:6px;background:rgba(148,163,184,.15);border-radius:100px;overflow:hidden}
+.progress-bar{height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:100px;transition:width .6s}
+
+/* ── RUNNER ── */
+.runner-stage{position:relative;width:100%;height:180px;overflow:hidden;border-radius:20px;background:linear-gradient(180deg,rgba(8,8,22,.9),rgba(12,18,48,.95));border:1px solid rgba(255,255,255,.06)}
+.runner{position:absolute;bottom:18px;left:-80px;animation:run 3s linear infinite}
+.run-leg{transform-origin:top center;animation:wlk .3s ease-in-out infinite alternate}
+.run-leg-b{animation-delay:.15s}
+.ground{position:absolute;bottom:10px;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,rgba(59,130,246,.4) 0 10px,transparent 10px 20px)}
+
+/* ── TIMER ── */
+.timer-3d{position:relative;width:240px;height:240px;margin:0 auto;transform-style:preserve-3d;animation:tilt 6s ease-in-out infinite}
+.timer-ring{position:absolute;inset:0;border-radius:50%}
+.timer-ring.outer{border:2px solid rgba(59,130,246,.15);box-shadow:0 0 40px rgba(59,130,246,.1),inset 0 0 40px rgba(59,130,246,.05)}
+.timer-svg{position:absolute;inset:10px}
+.timer-core{position:absolute;inset:18px;border-radius:50%;background:rgba(8,8,22,.8);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-value{font-size:38px;font-weight:900;color:#fff;line-height:1;letter-spacing:-2px}
+.timer-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(148,163,184,.5);margin-top:4px}
+
+/* ── CHEF ── */
+.chef-stage{position:relative;width:100%;height:260px;background:linear-gradient(180deg,rgba(8,8,22,.92) 0%,rgba(12,18,38,.96) 100%);border-radius:24px;overflow:hidden;margin:16px 0;border:1px solid rgba(255,255,255,.06)}
+.chef-kitchen{position:absolute;inset:0}
+
+/* ── KDS ── */
+.kds-ticket{background:rgba(12,12,26,.85);backdrop-filter:blur(40px);border:1px solid rgba(239,68,68,.22);border-radius:20px;padding:18px;transition:all .35s cubic-bezier(.34,1.2,.64,1);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 24px rgba(0,0,0,.40)}
+.kds-ticket:hover{border-color:rgba(239,68,68,.50);transform:translateY(-4px);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 20px 50px rgba(0,0,0,.50),0 0 30px rgba(239,68,68,.08)}
+.kds-ticket.urgent{border-color:#f97316;animation:urge 1.5s infinite}
+.stat-tile{background:rgba(12,12,30,.9);backdrop-filter:blur(40px);border:1px solid rgba(59,130,246,.18);border-radius:20px;padding:20px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 28px rgba(0,0,0,.40),0 0 40px rgba(59,130,246,.06)}
+.adm-tab{padding:10px 18px;border-radius:12px;font-weight:700;font-size:13px;color:rgba(241,245,249,.5);cursor:pointer;background:transparent;border:none;font-family:inherit;white-space:nowrap;transition:all .2s}
+.adm-tab.active{background:rgba(59,130,246,.2);color:#fff}
+
+/* ── MASCOT ── */
+#mascot{position:fixed;bottom:18px;right:18px;z-index:40;width:72px;height:72px;cursor:pointer;filter:drop-shadow(0 10px 24px rgba(59,130,246,.5));animation:floaty 3.2s ease-in-out infinite}
+#mascot:hover{animation-play-state:paused;transform:scale(1.08)}
+.bubble{position:fixed;bottom:100px;right:18px;z-index:41;max-width:280px;padding:14px 16px;border-radius:20px 20px 4px 20px;background:rgba(8,8,18,.92);backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,.1);opacity:0;transform:translateY(10px);transition:all .4s cubic-bezier(.4,0,.2,1)}
+.bubble.show{opacity:1;transform:translateY(0)}
+.closeB{position:absolute;top:10px;right:12px;cursor:pointer;font-size:13px;color:var(--ink-muted)}
+
+/* ── FOOTER LINK ── */
+.foot-links{position:fixed;bottom:16px;left:16px;z-index:30;display:flex;gap:8px;font-size:10px}
+.foot-link{padding:6px 12px;border-radius:100px;background:rgba(255,255,255,.07);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);color:var(--ink-soft);cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:1px;transition:all .2s}
+.foot-link:hover{background:#0f172a;color:#fff}
+
+/* ── TOAST ── */
+#toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-20px);z-index:100;padding:12px 20px;border-radius:14px;background:rgba(8,8,18,.92);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);color:var(--ink);font-weight:700;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;max-width:300px;text-align:center;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── PAGE LOADER ── */
+#pageLoader{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(4,4,10,0);opacity:0;transition:background .38s,opacity .38s}
+#pageLoader.show{pointer-events:auto;background:rgba(4,4,10,.62);opacity:1}
+.spinner-ring{width:72px;height:72px;border-radius:50%;border:3px solid rgba(59,130,246,.15);border-top-color:#3b82f6;animation:spinRing .8s infinite;box-shadow:0 0 30px rgba(59,130,246,.3)}
+
+/* ── LOADING SCREEN ── */
+#loadingScreen{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;transition:opacity .5s}
+#loadingScreen.hidden{opacity:0;pointer-events:none}
+.loader-ring{width:60px;height:60px;border-radius:50%;border:3px solid rgba(59,130,246,.2);border-top-color:#3b82f6;animation:loaderSpin 1s linear infinite;box-shadow:0 0 30px rgba(59,130,246,.4)}
+.loader-text{color:#60a5fa;font-size:13px;font-weight:700;margin-top:24px;letter-spacing:3px;text-transform:uppercase;animation:pulse 1.5s ease-in-out infinite}
+
+/* ── SCROLLBAR ── */
+.no-scrollbar::-webkit-scrollbar{display:none}
+.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+
+/* ── MOBILE FIXES ── */
+@media (max-width:640px){
+  .screen{padding:8px 12px 160px}
+  .hero-3d-wrap{height:300px}
+  .btn-neo.big{padding:16px 28px;font-size:15px}
+  .timer-3d{width:200px;height:200px}
+  .timer-value{font-size:32px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── BACKGROUND ── -->
+<div id="bgDecor">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+
+<!-- ── FLOATING UTENSILS ── -->
+<svg class="utensil knife" style="left:15%;top:5%" viewBox="0 0 40 120" xmlns="http://www.w3.org/2000/svg">
+  <path d="M20 5 L18 50 L22 50 L20 110 L22 115 L18 115 Z" fill="rgba(96,165,250,.5)" stroke="rgba(96,165,250,.8)" stroke-width="1"/>
+  <circle cx="20" cy="20" r="8" fill="rgba(96,165,250,.4)" opacity=".6"/>
+</svg>
+<svg class="utensil fork" style="left:25%;top:15%" viewBox="0 0 35 115" xmlns="http://www.w3.org/2000/svg">
+  <line x1="17.5" y1="10" x2="17.5" y2="50" stroke="rgba(96,165,250,.5)" stroke-width="2.5"/>
+  <path d="M10 50 L10 115 M17.5 50 L17.5 115 M25 50 L25 115" stroke="rgba(96,165,250,.5)" stroke-width="2" fill="none"/>
+  <circle cx="17.5" cy="25" r="6" fill="rgba(96,165,250,.4)" opacity=".5"/>
+</svg>
+<svg class="utensil spoon" style="right:12%;top:25%" viewBox="0 0 38 110" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="19" cy="25" rx="10" ry="12" fill="rgba(96,165,250,.4)" opacity=".6"/>
+  <line x1="19" y1="37" x2="19" y2="110" stroke="rgba(96,165,250,.5)" stroke-width="2.5"/>
+</svg>
+
+<!-- ── LOADING SCREEN ── -->
+<div id="loadingScreen">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Chargement</div>
+</div>
+
+<!-- ── PAGE LOADER ── -->
+<div id="pageLoader"><div class="spinner-ring"></div></div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<!-- ── MASCOT ── -->
+<svg id="mascot" viewBox="0 0 100 100" onclick="Avatar.toggleBubble()">
+  <defs>
+    <linearGradient id="bodyG" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="92" rx="22" ry="4" fill="rgba(0,0,0,.15)"/>
+  <path d="M30 48 Q30 40 50 40 Q70 40 70 48 L72 85 Q50 92 28 85 Z" fill="url(#bodyG)" stroke="#3b82f6" stroke-width="1.5"/>
+  <path d="M42 50 L50 54 L58 50 L58 58 L50 54 L42 58 Z" fill="#3b82f6"/>
+  <circle cx="50" cy="54" r="1.5" fill="#ffffff"/>
+  <circle cx="50" cy="30" r="14" fill="#fde6d3" stroke="#3b82f6" stroke-width="1.5"/>
+  <path d="M37 26 Q50 14 63 26 Q63 22 50 18 Q37 22 37 26 Z" fill="#1e293b"/>
+  <circle cx="45" cy="30" r="1.8" fill="#0f172a"/>
+  <circle cx="55" cy="30" r="1.8" fill="#0f172a"/>
+  <circle cx="45.5" cy="29.5" r=".6" fill="#fff"/>
+  <circle cx="55.5" cy="29.5" r=".6" fill="#fff"/>
+  <path d="M45 35 Q50 39 55 35" stroke="#0f172a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <rect x="18" y="48" width="18" height="4" rx="2" fill="#fde6d3" stroke="#3b82f6" stroke-width="1"/>
+  <rect x="12" y="44" width="14" height="3" rx="1" fill="#fff" stroke="#3b82f6" stroke-width="1"/>
+  <circle cx="72" cy="22" r="4" fill="#22c55e">
+    <animate attributeName="opacity" values="1;.3;1" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+<div id="bubble" class="bubble">
+  <span class="closeB" onclick="Avatar.closeBubble()">✕</span>
+  <span id="bubbleText">Salut ! Je suis Léo, ton serveur virtuel 🍽️</span>
+</div>
+
+<!-- ── FOOTER LINK ── -->
+<div class="foot-links">
+  <div class="foot-link" onclick="Router.go('staff-login')">Staff</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: LANDING
+     ════════════════════════════════════════════ -->
+<section id="scr-landing" class="screen active">
+  <div class="max-w-2xl mx-auto text-center">
+    <header class="header-pill mb-8" style="margin-top:12px">
+      <div class="text-left">
+        <h1 class="text-3xl font-extrabold tracking-tighter italic" style="color:#fff">NEO<span style="color:#60a5fa">BISTRO</span></h1>
+        <p style="color:rgba(200,214,255,.55);font-size:12px">Strasbourg • Ouvert ✅</p>
+      </div>
+      <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background:rgba(59,130,246,.15);border:1.5px solid rgba(59,130,246,.35)">
+        <span class="text-xl">🍔</span>
+      </div>
+    </header>
+
+    <!-- HERO — FIX : emoji spans au lieu de <img> cassées, positions internes, animation douce -->
+    <div class="hero-3d-wrap" style="position:relative">
+
+      <!-- FIX : 🍔 burger — coin haut gauche, dans le conteneur -->
+      <span class="food-emoji" style="top:10px;left:8px;font-size:64px;animation:floatFood 4s ease-in-out infinite;">🍔</span>
+
+      <!-- FIX : 🍕 pizza — coin haut droit, dans le conteneur -->
+      <span class="food-emoji" style="top:8px;right:6px;font-size:72px;animation:floatFood 5s ease-in-out infinite .5s;">🍕</span>
+
+      <!-- FIX : 🍚 bol de riz chinois (remplace l'ingrédient gris en bas à gauche) -->
+      <span class="food-emoji" style="bottom:10px;left:8px;font-size:62px;animation:floatFood 4.5s ease-in-out infinite 1s;">🍚</span>
+
+      <!-- FIX : 🍹 cocktail — coin bas droit, dans le conteneur -->
+      <span class="food-emoji" style="bottom:10px;right:8px;font-size:58px;animation:floatFood 3.8s ease-in-out infinite 1.5s;">🍹</span>
+
+      <!-- FIX : 🥗 salade — milieu gauche, position calculée pour rester dans le conteneur -->
+      <span class="food-emoji" style="top:calc(50% - 28px);left:4px;font-size:52px;animation:floatFood 4.2s ease-in-out infinite .8s;">🥗</span>
+
+      <!-- FIX : 🍋 citron — milieu droit, dans le conteneur -->
+      <span class="food-emoji" style="top:calc(50% - 24px);right:4px;font-size:44px;animation:floatFood 3.5s ease-in-out infinite 2s;">🍋</span>
+
+      <div class="overlay">
+        <h2 class="hero-title text-4xl md:text-5xl mb-3" style="color:#fff">
+          Bienvenue, je suis votre<br>assistant pour votre repas
+        </h2>
+        <p style="font-family:'Playfair Display',serif;font-style:italic;color:rgba(255,255,255,.72);font-size:12px;max-width:340px;margin-top:10px;letter-spacing:.3px;line-height:1.6">
+          L'IA qui mémorise votre commande sans jamais avoir besoin de café — enfin presque. 🫡
+        </p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button class="btn-neo btn-blue big mb-8" onclick="Router.go('login')" style="animation:btnPulse 2s infinite">
+      COMMANDER MAINTENANT
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </button>
+
+    <!-- FEATURE CARDS -->
+    <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto mb-10">
+      <div class="glass-card rounded-2xl p-4 text-center">
+        <div class="text-2xl mb-1">⚡</div>
+        <div style="font-size:11px;font-weight:700;color:#fff">Commande express</div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 text-center">
+        <div class="text-2xl mb-1">👨‍🍳</div>
+        <div style="font-size:11px;font-weight:700;color:#fff">Suivi en direct</div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 text-center">
+        <div class="text-2xl mb-1">🛎️</div>
+        <div style="font-size:11px;font-weight:700;color:#fff">Serveur sur demande</div>
+      </div>
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="flex justify-center gap-3 flex-wrap mb-10">
+      <a href="#" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:14px;background:rgba(24,119,242,.15);border:1px solid rgba(24,119,242,.35);color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">📘 Facebook</a>
+      <a href="#" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:14px;background:rgba(225,48,108,.15);border:1px solid rgba(225,48,108,.35);color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">📸 Instagram</a>
+      <a href="#" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:14px;background:rgba(255,252,0,.1);border:1px solid rgba(255,252,0,.3);color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">👻 Snapchat</a>
+      <a href="#" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">✖️ X</a>
+    </div>
+
+    <!-- RESTAURATEUR SECTION -->
+    <div style="background:rgba(8,8,18,.75);border:1.5px solid rgba(59,130,246,.35);border-radius:24px;padding:32px 24px;text-align:center;margin-bottom:24px">
+      <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#ffffff;letter-spacing:-1px;margin:0 0 12px">Vous êtes restaurateur ?</h2>
+      <p style="color:rgba(200,214,255,.75);font-size:14px;max-width:480px;margin:0 auto 20px;line-height:1.7">"Offrez à vos clients une expérience de commande digitale unique avec Léo, votre serveur IA."</p>
+      <div class="grid grid-cols-2 gap-3 mb-6 max-w-sm mx-auto">
+        <div class="glass-card rounded-2xl p-4 text-center">
+          <div class="text-2xl mb-2">📱</div>
+          <div style="font-size:11px;font-weight:700;color:#fff">Commande sur table</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-center">
+          <div class="text-2xl mb-2">📊</div>
+          <div style="font-size:11px;font-weight:700;color:#fff">Analyses en temps réel</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-center">
+          <div class="text-2xl mb-2">🍽️</div>
+          <div style="font-size:11px;font-weight:700;color:#fff">Carte digitale</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-center">
+          <div class="text-2xl mb-2">🤖</div>
+          <div style="font-size:11px;font-weight:700;color:#fff">IA intégrée</div>
+        </div>
+      </div>
+      <button onclick="Router.go('staff-login')" class="btn-neo btn-blue" style="font-size:13px">Voir la solution complète →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: LOGIN
+     ════════════════════════════════════════════ -->
+<section id="scr-login" class="screen">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+    <div class="max-w-md mx-auto pt-4 w-full">
+      <div class="glass-card rounded-[36px] p-8">
+        <div class="text-center mb-6">
+          <div class="text-5xl mb-3">👋</div>
+          <h2 class="text-2xl font-black tracking-tight" style="color:#fff">Connexion</h2>
+          <p style="color:var(--ink-soft);font-size:13px;margin-top:4px">Pour commencer ta commande</p>
+        </div>
+        <button onclick="Auth.googleLogin()" class="w-full mb-3 flex items-center justify-center gap-3 py-3.5 px-5 cursor-pointer" style="border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-weight:600;color:var(--ink);font-family:inherit;font-size:14px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.2 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.1 18.9 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.2 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.8-5.3l-6.4-5.4c-2 1.5-4.6 2.4-7.4 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.1 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4 5.6l6.4 5.4C41.1 35.4 44 30 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>
+          Continuer avec Google
+        </button>
+        <div class="flex items-center gap-3 my-5">
+          <div class="flex-1 h-px" style="background:rgba(255,255,255,.1)"></div>
+          <span style="font-size:11px;color:var(--ink-muted);font-weight:700">OU</span>
+          <div class="flex-1 h-px" style="background:rgba(255,255,255,.1)"></div>
+        </div>
+        <div class="space-y-3">
+          <input id="loginEmail" class="neo-input" type="email" placeholder="Ton email">
+          <input id="loginPwd" class="neo-input" type="password" placeholder="Ton mot de passe">
+          <button onclick="Auth.emailLogin()" class="btn-neo btn-blue w-full">Se connecter / S'inscrire</button>
+        </div>
+        <p style="font-size:11px;color:var(--ink-muted);margin-top:20px;text-align:center">Un compte sera créé automatiquement si tu n'en as pas.</p>
+      </div>
+      <button onclick="Router.go('landing')" class="mt-4 mx-auto block text-sm cursor-pointer" style="color:rgba(148,163,184,.6);background:none;border:none;font-family:inherit">← Retour</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: TABLE
+     ════════════════════════════════════════════ -->
+<section id="scr-table" class="screen">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+    <div class="max-w-md mx-auto pt-4 w-full">
+      <div class="glass-card rounded-[36px] p-8">
+        <div class="text-center mb-6">
+          <div class="text-5xl mb-3">🪑</div>
+          <h2 class="text-2xl font-black tracking-tight mb-2" style="color:#fff">Quelle est ta table ?</h2>
+          <p style="color:#fff;font-size:13px;line-height:1.6">Tu trouveras le numéro de ta table écrit sur un petit chevalet au centre ou en coin de table.</p>
+        </div>
+        <input id="tableNumInput" class="neo-input text-center font-black tracking-widest" type="number" placeholder="12" autofocus style="font-size:36px;padding:20px;text-align:center" onkeydown="if(event.key==='Enter')Client.confirmTable()">
+        <button onclick="Client.confirmTable()" class="btn-neo btn-blue w-full mt-5 big">
+          VALIDER
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: MENU
+     ════════════════════════════════════════════ -->
+<section id="scr-menu" class="screen">
+  <div class="max-w-2xl mx-auto">
+    <header class="header-pill mb-6 mt-2">
+      <div class="text-left">
+        <h1 class="text-xl font-extrabold italic" style="color:#fff">NEO<span style="color:#60a5fa">BISTRO</span></h1>
+        <p style="color:rgba(200,214,255,.55);font-size:11px">Table <span id="tableNumDisplay">—</span></p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="Waiter.open()" class="nav-btn text-lg" title="Appeler le serveur">🛎️</button>
+        <button onclick="Auth.logout()" class="nav-btn" style="font-size:12px;color:var(--ink-soft)">✕</button>
+      </div>
+    </header>
+
+    <nav id="catNav" class="flex gap-3 mb-6 overflow-x-auto pb-2 no-scrollbar">
+      <button class="category-pill active" onclick="Client.filter('entrees',this)">🥗 Entrées</button>
+      <button class="category-pill" onclick="Client.filter('plats',this)">🍽️ Plats</button>
+      <button class="category-pill" onclick="Client.filter('desserts',this)">🍰 Desserts</button>
+      <button class="category-pill" onclick="Client.filter('boissons',this)">🍹 Boissons</button>
+    </nav>
+
+    <div class="grid grid-cols-1 gap-4 pb-32" id="menuGrid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))"></div>
+  </div>
+
+  <div class="fixed bottom-6 left-0 right-0 z-30 flex justify-center px-4">
+    <button onclick="Cart.validate()" class="btn-neo btn-blue big" style="min-width:280px;animation:btnPulse 2s infinite">
+      🛒 Commander · <span id="cartCount">0</span> article(s) — <span id="cartTotal">0.00€</span>
+    </button>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: RUNNING (commande envoyée)
+     ════════════════════════════════════════════ -->
+<section id="scr-running" class="screen">
+  <div class="max-w-xl mx-auto pt-4">
+    <div class="glass-card rounded-[36px] p-8 text-center">
+      <h2 class="text-2xl font-black tracking-tight mb-2" style="color:#fff">Commande confirmée ! ✅</h2>
+      <p style="color:var(--ink-soft);font-size:13px;margin-bottom:20px">Léo court pour la déposer en cuisine...</p>
+      <div class="runner-stage mb-6">
+        <div class="ground"></div>
+        <svg class="runner" width="90" height="90" viewBox="0 0 100 100">
+          <circle cx="50" cy="22" r="10" fill="#fde6d3"/>
+          <path d="M40 20 Q50 10 60 20 Q60 16 50 12 Q40 16 40 20 Z" fill="#1e293b"/>
+          <circle cx="52" cy="22" r="1.3" fill="#0f172a"/>
+          <path d="M38 32 Q50 28 62 32 L65 58 L35 58 Z" fill="#3b82f6"/>
+          <rect x="62" y="32" width="20" height="3" rx="1" fill="#fde6d3" transform="rotate(-25 62 32)"/>
+          <ellipse cx="85" cy="18" rx="10" ry="3" fill="#fff" stroke="#3b82f6" stroke-width="1"/>
+          <rect class="run-leg" x="44" y="58" width="5" height="22" rx="2" fill="#0f172a"/>
+          <rect class="run-leg run-leg-b" x="52" y="58" width="5" height="22" rx="2" fill="#0f172a"/>
+        </svg>
+      </div>
+      <div class="progress mb-3">
+        <div class="progress-bar" id="runProgress" style="width:0%"></div>
+      </div>
+      <p style="font-size:13px;color:var(--ink);font-weight:600"><span id="runTimer">2:00</span> restantes</p>
+      <p style="font-size:11px;color:var(--ink-muted);margin-top:24px">💡 Garde ton téléphone allumé pour suivre la préparation</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: COOKING
+     ════════════════════════════════════════════ -->
+<section id="scr-cooking" class="screen">
+  <div class="max-w-xl mx-auto pt-2">
+    <div class="glass-card rounded-[36px] p-6 mb-5 text-center">
+      <h2 class="text-2xl font-black tracking-tight mb-1" style="color:#fff">En cuisine ! 👨‍🍳</h2>
+      <p style="color:var(--ink-soft);font-size:13px;margin-bottom:16px">Ton plat est entre les mains du chef</p>
+      <div class="chef-stage">
+        <svg class="chef-kitchen" viewBox="0 0 400 260" preserveAspectRatio="xMidYMax meet">
+          <rect x="0" y="180" width="400" height="80" fill="#0a0a1a"/>
+          <rect x="0" y="175" width="400" height="8" fill="#12122a"/>
+          <circle cx="150" cy="210" r="26" fill="#06060e" stroke="#1e2040" stroke-width="2"/>
+          <circle cx="150" cy="210" r="18" fill="#0a0a1a"/>
+          <g transform="translate(260,70)">
+            <ellipse cx="0" cy="-4" rx="26" ry="16" fill="#0a0a1a"/>
+            <rect x="-22" y="4" width="44" height="8" fill="#0a0a1a"/>
+            <circle cx="0" cy="20" r="14" fill="#fde6d3"/>
+            <circle cx="-4" cy="20" r="1.5" fill="#0f172a"/>
+            <circle cx="4" cy="20" r="1.5" fill="#0f172a"/>
+            <path d="M-5 25 Q0 28 5 25" stroke="#1e293b" stroke-width="1.5" fill="none"/>
+            <path d="M-18 34 Q-20 60 -20 90 L20 90 Q20 60 18 34 Z" fill="#0a0a1a"/>
+            <rect x="-16" y="36" width="3" height="16" fill="#3b82f6"/>
+            <rect x="-13" y="36" width="3" height="16" fill="#fff"/>
+            <rect x="-10" y="36" width="3" height="16" fill="#ef4444"/>
+          </g>
+          <g transform="translate(150,180)">
+            <ellipse cx="0" cy="18" rx="38" ry="10" fill="#0a0a1a"/>
+            <rect x="-36" y="4" width="72" height="16" rx="2" fill="#12122a"/>
+            <ellipse cx="0" cy="8" rx="26" ry="6" fill="#f59e0b"/>
+            <circle cx="-10" cy="6" r="3" fill="#dc2626"/>
+            <circle cx="8" cy="9" r="3" fill="#15803d"/>
+          </g>
+          <ellipse cx="135" cy="202" rx="5" ry="9" fill="#f97316"><animate attributeName="ry" values="9;11;9" dur=".3s" repeatCount="indefinite"/></ellipse>
+          <ellipse cx="150" cy="200" rx="6" ry="12" fill="#fbbf24"><animate attributeName="ry" values="12;14;11;12" dur=".4s" repeatCount="indefinite"/></ellipse>
+          <ellipse cx="165" cy="202" rx="5" ry="9" fill="#f97316"><animate attributeName="ry" values="9;7;10;9" dur=".35s" repeatCount="indefinite"/></ellipse>
+          <circle cx="130" cy="150" r="6" fill="rgba(200,214,255,.3)"><animate attributeName="cy" values="150;90;50" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;.3;0" dur="2.5s" repeatCount="indefinite"/></circle>
+          <circle cx="155" cy="150" r="7" fill="rgba(200,214,255,.3)"><animate attributeName="cy" values="150;70;30" dur="3s" repeatCount="indefinite" begin=".8s"/><animate attributeName="opacity" values=".6;.3;0" dur="3s" repeatCount="indefinite" begin=".8s"/></circle>
+        </svg>
+      </div>
+    </div>
+    <div class="glass-card rounded-[36px] p-8 text-center">
+      <p style="font-size:11px;font-weight:700;letter-spacing:3px;color:var(--ink-muted);text-transform:uppercase;margin-bottom:20px">Temps estimé de préparation</p>
+      <div class="timer-3d">
+        <div class="timer-ring outer"></div>
+        <svg class="timer-svg" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(148,163,184,.1)" stroke-width="4"/>
+          <circle id="cookArc" cx="50" cy="50" r="46" fill="none" stroke="url(#arcG)" stroke-width="4" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289" transform="rotate(-90 50 50)"/>
+          <defs>
+            <linearGradient id="arcG"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#60a5fa"/></linearGradient>
+          </defs>
+        </svg>
+        <div class="timer-core">
+          <div class="timer-value" id="cookTime">15:00</div>
+          <div class="timer-label">Minutes</div>
+        </div>
+      </div>
+      <button onclick="Client.plateArrived()" class="btn-neo btn-blue big mt-6 w-full">✨ MON PLAT EST DÉJÀ LÀ</button>
+      <p style="font-size:11px;color:var(--ink-muted);margin-top:12px">Appuie dès que ton plat arrive à table</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: ENJOY
+     ════════════════════════════════════════════ -->
+<section id="scr-enjoy" class="screen">
+  <div class="max-w-xl mx-auto pt-4">
+    <div class="glass-card rounded-[36px] p-8 text-center">
+      <div class="text-6xl mb-4">🍽️</div>
+      <h2 class="text-3xl font-black tracking-tight mb-2" style="color:#fff;letter-spacing:-1px">Bon repas à toi !</h2>
+      <p style="color:rgba(200,214,255,.75);font-size:15px;margin-bottom:24px">Ton plat est arrivé. Profite de chaque bouchée 🤤</p>
+      <div class="grid grid-cols-1 gap-3">
+        <button onclick="Router.go('menu')" class="btn-neo btn-blue">🍷 Commander autre chose</button>
+        <button onclick="Waiter.open()" class="btn-neo ghost">🛎️ Appeler le serveur</button>
+        <button onclick="Client.askForBill()" class="btn-neo ghost">💳 J'ai terminé / Régler au bar</button>
+      </div>
+      <p style="font-size:11px;color:var(--ink-muted);margin-top:24px;line-height:1.6">Merci pour ta commande 💙<br>On espère te revoir bientôt !</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: STAFF LOGIN
+     ════════════════════════════════════════════ -->
+<section id="scr-staff-login" class="screen">
+  <div class="max-w-md mx-auto pt-4">
+    <div class="glass-card rounded-[36px] p-8">
+      <div class="text-center mb-6">
+        <div class="text-5xl mb-3">🔐</div>
+        <h2 class="text-2xl font-black tracking-tight" style="color:#fff">Accès Staff</h2>
+        <p style="color:var(--ink-soft);font-size:13px;margin-top:4px">Admin • Bar • Cuisine</p>
+      </div>
+      <div class="space-y-3">
+        <input id="staffUser" class="neo-input" type="text" placeholder="Identifiant">
+        <input id="staffPwd" class="neo-input" type="password" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')Auth.staffLogin()">
+        <button onclick="Auth.staffLogin()" class="btn-neo w-full">Connexion</button>
+      </div>
+      <div class="mt-5 p-4 rounded-2xl" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);font-size:12px;color:rgba(147,197,253,.9);line-height:1.7">
+        <b style="color:#60a5fa">Comptes de démo :</b><br>
+        admin / neo2026 — Admin dashboard<br>
+        bar / bar2026 — Bar<br>
+        cuisine / cuisine2026 — Cuisine
+      </div>
+    </div>
+    <button onclick="Router.go('landing')" class="mt-4 mx-auto block text-sm cursor-pointer" style="color:rgba(148,163,184,.6);background:none;border:none;font-family:inherit">← Retour</button>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: KDS (Cuisine / Bar)
+     ════════════════════════════════════════════ -->
+<section id="scr-kds" class="screen">
+  <div class="max-w-7xl mx-auto p-4 pt-6">
+    <header class="header-pill mb-6">
+      <div>
+        <h1 class="text-3xl font-black tracking-tight" style="color:#fff">KDS <span id="kdsRoleLabel" style="color:#ef4444">CUISINE</span></h1>
+        <p style="font-size:11px;color:rgba(148,163,184,.6);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Tickets en temps réel</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-center">
+          <div class="text-2xl font-black" style="color:#fff" id="kdsActive">0</div>
+          <div style="font-size:11px;color:rgba(148,163,184,.6)">Actifs</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-black" style="color:#22c55e" id="kdsDone">0</div>
+          <div style="font-size:11px;color:rgba(148,163,184,.6)">Servis</div>
+        </div>
+        <button onclick="Auth.logout()" class="btn-neo ghost" style="padding:8px 14px;font-size:12px">Déconnexion</button>
+      </div>
+    </header>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="kdsGrid"></div>
+    <div class="mt-8">
+      <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(148,163,184,.5);margin-bottom:12px">🛎️ Demandes serveur</h3>
+      <div id="kdsCalls" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SCREEN: ADMIN
+     ════════════════════════════════════════════ -->
+<section id="scr-admin" class="screen">
+  <div class="max-w-7xl mx-auto p-4 pt-6">
+    <header class="header-pill mb-6">
+      <div>
+        <h1 class="text-3xl font-black tracking-tight" style="color:#fff">COMMAND <span style="color:#60a5fa">CENTER</span></h1>
+        <p style="font-size:11px;color:rgba(148,163,184,.6);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Administration NeoBistro</p>
+      </div>
+      <button onclick="Auth.logout()" class="btn-neo ghost" style="padding:8px 14px;font-size:12px">Déconnexion</button>
+    </header>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div class="stat-tile"><div class="text-3xl font-black" style="color:#fff" id="sCA">0€</div><div style="font-size:11px;color:rgba(148,163,184,.6);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">CA Jour</div></div>
+      <div class="stat-tile"><div class="text-3xl font-black" style="color:#60a5fa" id="sOrders">0</div><div style="font-size:11px;color:rgba(148,163,184,.6);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">Commandes</div></div>
+      <div class="stat-tile"><div class="text-3xl font-black" style="color:#22c55e" id="sServed">0</div><div style="font-size:11px;color:rgba(148,163,184,.6);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">Servis</div></div>
+      <div class="stat-tile"><div class="text-3xl font-black" style="color:#f59e0b" id="sAvg">0€</div><div style="font-size:11px;color:rgba(148,163,184,.6);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">Ticket moyen</div></div>
+    </div>
+    <div class="flex gap-2 mb-5 overflow-x-auto no-scrollbar">
+      <button class="adm-tab active" onclick="Admin.tab('menu',this)">🍽️ Carte</button>
+      <button class="adm-tab" onclick="Admin.tab('offers',this)">🎁 Offres</button>
+      <button class="adm-tab" onclick="Admin.tab('orders',this)">📋 Commandes live</button>
+      <button class="adm-tab" onclick="Admin.tab('users',this)">👥 Comptes staff</button>
+      <button class="adm-tab" onclick="Admin.tab('settings',this)">⚙️ Paramètres</button>
+    </div>
+    <div id="adm-menu">
+      <div class="dark-card mb-4 flex items-center justify-between">
+        <div><h3 class="font-bold" style="color:#fff">Gestion de la carte</h3><p style="font-size:12px;color:rgba(148,163,184,.6)">Modifie les prix, noms, descriptions et disponibilités</p></div>
+        <button onclick="Admin.newProduct()" class="btn-neo btn-blue" style="padding:10px 18px;font-size:13px">+ Nouveau plat</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="admMenuGrid"></div>
+    </div>
+    <div id="adm-offers" class="hidden">
+      <div class="dark-card mb-4 flex items-center justify-between">
+        <div><h3 class="font-bold" style="color:#fff">Offres / Menu du jour</h3><p style="font-size:12px;color:rgba(148,163,184,.6)">Affichée en popup à l'accueil du menu client</p></div>
+        <button onclick="Admin.newOffer()" class="btn-neo btn-blue" style="padding:10px 18px;font-size:13px">+ Nouvelle offre</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="admOffersList"></div>
+    </div>
+    <div id="adm-orders" class="hidden">
+      <div id="admOrdersList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+    <div id="adm-users" class="hidden">
+      <div class="dark-card mb-4 flex items-center justify-between">
+        <div><h3 class="font-bold" style="color:#fff">Comptes Staff</h3><p style="font-size:12px;color:rgba(148,163,184,.6)">Créer, modifier, supprimer les accès admin / bar / cuisine</p></div>
+        <button onclick="Admin.newUser()" class="btn-neo btn-blue" style="padding:10px 18px;font-size:13px">+ Nouveau compte</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="admUsersList"></div>
+    </div>
+    <div id="adm-settings" class="hidden">
+      <div class="dark-card">
+        <h3 class="font-bold mb-4" style="color:#fff">⚙️ Paramètres globaux</h3>
+        <div class="space-y-5">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:rgba(148,163,184,.6);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Temps moyen de préparation (minutes)</label>
+            <input id="sCookMin" class="neo-input" type="number" min="1" max="60" value="15">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:rgba(148,163,184,.6);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Nom du restaurant</label>
+            <input id="sRestoName" class="neo-input" value="NeoBistro">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:rgba(148,163,184,.6);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Email patron</label>
+            <input id="sPatronMail" class="neo-input" type="email" value="patron@neobistro.fr">
+          </div>
+          <button onclick="Admin.saveSettings()" class="btn-neo btn-blue w-full">💾 Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     MODALS
+     ════════════════════════════════════════════ -->
+
+<!-- Welcome Leo -->
+<div id="mdWelcome" class="modal">
+  <div class="modal-card" style="max-width:380px">
+    <div class="modal-close" onclick="Client.closeWelcome()">✕</div>
+    <div class="text-center pt-6">
+      <div class="text-5xl mb-4">🤖</div>
+      <h3 class="text-xl font-black mb-1" style="color:#fff">Bienvenue ! Je suis Léo</h3>
+      <p style="color:rgba(200,214,255,.48);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:14px">SERVEUR IA · NEOBISTRO STRASBOURG 🇫🇷</p>
+      <div style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:18px;padding:16px;margin-bottom:20px;text-align:left">
+        <p style="color:var(--ink-soft);font-size:13.5px;line-height:1.85;margin:0">Vous pouvez <b style="color:#60a5fa">prendre place</b> dans notre restaurant, je vais m'occuper de vous.</p>
+      </div>
+      <button onclick="Client.closeWelcome()" class="btn-neo btn-blue big w-full">🍽️ VOIR LA CARTE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Waiter call -->
+<div id="mdWaiter" class="modal">
+  <div class="modal-card">
+    <div class="modal-close" onclick="Waiter.close()">✕</div>
+    <div class="text-center mb-4 pt-4">
+      <div class="text-4xl mb-2">🛎️</div>
+      <h3 class="text-xl font-black" style="color:#fff">Pourquoi appeler le serveur ?</h3>
+      <p style="font-size:11px;color:var(--ink-muted);margin-top:4px">Sélectionne une raison rapide ou précise ta demande</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4" id="waiterQuickGrid"></div>
+    <label style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px;margin-top:16px">Demande personnalisée</label>
+    <textarea id="waiterCustom" class="neo-input" rows="3" placeholder="Ex : un peu plus de sauce s'il te plaît..."></textarea>
+    <button onclick="Waiter.send()" class="btn-neo btn-blue w-full mt-4">🛎️ ENVOYER AU SERVEUR</button>
+  </div>
+</div>
+
+<!-- Product detail -->
+<div id="mdProduct" class="modal">
+  <div class="modal-card" id="mdProductBody"></div>
+</div>
+
+<!-- Offer -->
+<div id="mdOffer" class="modal">
+  <div class="modal-card" id="mdOfferBody"></div>
+</div>
+
+<!-- Bill reason -->
+<div id="mdBillReason" class="modal">
+  <div class="modal-card">
+    <div class="modal-close" onclick="Modal.close('mdBillReason')">✕</div>
+    <div class="text-center pt-4">
+      <div class="text-4xl mb-2">💳</div>
+      <h3 class="text-xl font-black mb-1" style="color:#fff">On appelle le serveur pour l'addition ?</h3>
+      <p style="font-size:11px;color:var(--ink-muted);margin-bottom:16px">Précise ta demande</p>
+    </div>
+    <textarea id="billMsg" class="neo-input" rows="3" placeholder="Ex : CB, table 12, merci 🙏"></textarea>
+    <button onclick="Client.sendBillRequest()" class="btn-neo btn-blue w-full mt-4">Envoyer la demande</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+     ════════════════════════════════════════════ -->
+<script>
+/* ── STATE ── */
+const State = {
+  user:null, userRole:null, table:null,
+  cart:[], activeOrderId:null, cookMins:15,
+  restoName:'NeoBistro', patronMail:'patron@neobistro.fr',
+  currentCat:'entrees', orders:[], calls:[],
+
+  quickCalls:[
+    {emo:'🧂',txt:'Sel'},{emo:'🌶️',txt:'Poivre'},{emo:'💧',txt:'Eau'},
+    {emo:'🥖',txt:'Pain'},{emo:'🥤',txt:'Coca'},{emo:'🟠',txt:'Orangina'},
+    {emo:'🔸',txt:'Fanta'},{emo:'🥗',txt:'Doubler l\'accompagnement'},
+    {emo:'🥬',txt:'Supplément salade'},{emo:'🧊',txt:'Glaçons'}
+  ],
+
+  menu:[
+    {id:101,cat:'entrees',name:'Tataki de Thon',price:9.50,desc:'Thon sashimi, sauce ponzu, huile sésame grillé.',img:'https://www.pngall.com/wp-content/uploads/5/Tuna-PNG-Free-Image.png',badge:'Signature',bc:'bg-red-100 text-red-600',bio:false},
+    {id:102,cat:'entrees',name:'Salade Obsidienne',price:8.00,desc:'Quinoa, avocat, grenade, vinaigrette citron yuzu.',img:'https://purepng.com/public/uploads/large/purepng.com-saladvegetablessalad-bowlgreenchoppedraw-vegetablesfresh-1701528661038nwq24.png',badge:'Vegan',bc:'bg-emerald-100 text-emerald-700',bio:true},
+    {id:201,cat:'plats',name:'Le Neo-Cheeseburger',price:14.50,desc:'Bœuf d\'origine, cheddar coulant, sauce secrète IA.',img:'https://www.pngarts.com/files/3/Burger-PNG-Transparent-Image.png',badge:'Best Seller',bc:'bg-orange-100 text-orange-600',bio:false},
+    {id:202,cat:'plats',name:'Pizza Truffe Zen',price:18.00,desc:'Mozzarella fior di latte, crème de truffe noire.',img:'https://www.freeiconspng.com/uploads/pizza-png-15.png',badge:'Végétarien',bc:'bg-green-100 text-green-700',bio:true},
+    {id:301,cat:'desserts',name:'Fondant Noir 72%',price:7.50,desc:'Cœur coulant, crème anglaise, éclats de sel rose.',img:'https://www.pngall.com/wp-content/uploads/2/Chocolate-Cake-PNG-Image.png',badge:'Maison',bc:'bg-amber-100 text-amber-700',bio:false},
+    {id:302,cat:'desserts',name:'Tiramisu Neo',price:6.50,desc:'Café arabica, mascarpone maison, cacao Valrhona.',img:'https://purepng.com/public/uploads/large/purepng.com-tiramisu-cakecakedessertfoodtiramisu-1701528640735j17e2.png',badge:'Signature',bc:'bg-yellow-100 text-yellow-700',bio:true},
+    {id:401,cat:'boissons',name:'Limonade Artisanale',price:4.50,desc:'Citron pressé, gingembre, menthe, sirop agave.',img:'https://www.pngall.com/wp-content/uploads/5/Lemonade-PNG-Clipart.png',badge:'Fresh',bc:'bg-lime-100 text-lime-700',bio:true},
+    {id:402,cat:'boissons',name:'Cocktail Negroni',price:11.00,desc:'Gin artisanal, Campari, vermouth, orange fumée.',img:'https://www.pngall.com/wp-content/uploads/5/Cocktail-PNG-Clipart.png',badge:'Signature',bc:'bg-purple-100 text-purple-700',bio:false},
+  ],
+
+  offers:[
+    {id:'of1',title:'🔥 Menu du jour',desc:'Entrée + Plat + Dessert pour 24€ seulement ! (au lieu de 32€)',price:24.00,active:true}
+  ],
+
+  users:[
+    {id:'u1',username:'admin',password:'neo2026',role:'admin',name:'Brice (Owner)'},
+    {id:'u2',username:'bar',password:'bar2026',role:'bar',name:'Bar'},
+    {id:'u3',username:'cuisine',password:'cuisine2026',role:'cuisine',name:'Cuisine'}
+  ],
+
+  load(){
+    try{
+      const s=localStorage.getItem('nb_state');
+      if(s){const d=JSON.parse(s);['menu','offers','users','cookMins','restoName','patronMail'].forEach(k=>{if(d[k])this[k]=d[k]});}
+    }catch(e){}
+  },
+  save(){
+    try{localStorage.setItem('nb_state',JSON.stringify({menu:this.menu,offers:this.offers,users:this.users,cookMins:this.cookMins,restoName:this.restoName,patronMail:this.patronMail}));}catch(e){}
+  }
+};
+
+/* ── BROADCAST / SYNC ── */
+let BC=null;
+try{BC=new BroadcastChannel('neobistro-v2');}catch(e){}
+const Sync={
+  send(type,data){try{BC&&BC.postMessage({type,data});}catch(e){}},
+  receive({type,data}){
+    if(type==='ORDER'){
+      if(!State.orders.find(o=>o.id===data.id))State.orders.push(data);
+      if(State.userRole==='cuisine'||State.userRole==='bar'){Kds.render();Kds.ping();}
+      if(State.userRole==='admin')Admin.refresh();
+    }
+    if(type==='STATUS'){
+      const o=State.orders.find(x=>x.id===data.id);
+      if(o)o.status=data.status;
+      if(State.userRole==='client'&&State.activeOrderId===data.id)Client.onStatusUpdate(data.status);
+      if(State.userRole==='cuisine'||State.userRole==='bar')Kds.render();
+      if(State.userRole==='admin')Admin.refresh();
+    }
+    if(type==='CALL'){
+      State.calls.push(data);
+      if(State.userRole==='cuisine'||State.userRole==='bar'){Kds.renderCalls();Toast.show('🛎️ Table '+data.table);}
+    }
+    if(type==='MENU'){State.menu=data;if(State.userRole==='client')Client.renderMenu();}
+  }
+};
+if(BC)BC.onmessage=e=>Sync.receive(e.data);
+
+/* ── ROUTER ── */
+const Router={
+  _busy:false,
+  go(screen){
+    if(this._busy)return;
+    this._busy=true;
+    const loader=document.getElementById('pageLoader');
+    const current=document.querySelector('.screen.active');
+    if(current){current.style.transition='opacity .25s';current.style.opacity='0';}
+    loader.classList.add('show');
+    setTimeout(()=>{
+      document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='';s.style.transition='';});
+      const target=document.getElementById('scr-'+screen);
+      if(target){target.classList.add('active');}
+      window.scrollTo({top:0,behavior:'instant'});
+      loader.classList.remove('show');
+      Avatar.onScreen(screen);
+      this._busy=false;
+      if(screen==='menu')Client.renderMenu();
+      if(screen==='admin')Admin.refresh();
+    },500);
+  }
+};
+
+/* ── MODAL ── */
+const Modal={
+  open(id){const el=document.getElementById(id);if(el)el.classList.add('open');},
+  close(id){const el=document.getElementById(id);if(el)el.classList.remove('open');}
+};
+
+/* ── TOAST ── */
+const Toast={
+  t:null,
+  show(msg,ms=2500){
+    const el=document.getElementById('toast');
+    el.textContent=msg;el.classList.add('show');
+    clearTimeout(this.t);
+    this.t=setTimeout(()=>el.classList.remove('show'),ms);
+  }
+};
+
+/* ── AVATAR ── */
+const Avatar={
+  bubbleVisible:false,timer:null,_current:null,
+  say(txt,stay=5000){
+    const b=document.getElementById('bubble');
+    document.getElementById('bubbleText').textContent=txt;
+    b.classList.add('show');this.bubbleVisible=true;
+    clearTimeout(this.timer);
+    this.timer=setTimeout(()=>this.closeBubble(),stay);
+  },
+  closeBubble(){document.getElementById('bubble').classList.remove('show');this.bubbleVisible=false;},
+  toggleBubble(){
+    if(this.bubbleVisible)this.closeBubble();
+    else this.say(this._current||'Besoin d\'aide ? Clique sur 🛎️ ou parle-moi !');
+  },
+  onScreen(s){
+    const m={login:'Connecte-toi pour commander 👋',table:'Le numéro de ta table est écrit dessus !',menu:'Choisis tes entrées, je m\'occupe du reste 🍽️',running:'Je cours déposer ta commande !',cooking:'Le chef s\'active. Plus que quelques minutes 👨‍🍳',enjoy:'Bon appétit ! Je reste dispo si besoin 💙'};
+    if(m[s]){this._current=m[s];this.say(m[s],6000);}
+  }
+};
+
+/* ── AUTH ── */
+const Auth={
+  googleLogin(){
+    State.user={email:'client@google.com',name:'Invité Google',provider:'google'};
+    State.userRole='client';
+    Toast.show('Connexion Google réussie 👋');
+    Router.go('table');
+  },
+  emailLogin(){
+    const email=document.getElementById('loginEmail').value.trim();
+    const pwd=document.getElementById('loginPwd').value.trim();
+    if(!email||!pwd){Toast.show('Email + mot de passe requis');return;}
+    State.user={email,name:email.split('@')[0],provider:'email'};
+    State.userRole='client';
+    Toast.show('Compte prêt — bienvenue !');
+    Router.go('table');
+  },
+  staffLogin(){
+    const u=document.getElementById('staffUser').value.trim();
+    const p=document.getElementById('staffPwd').value.trim();
+    const acct=State.users.find(x=>x.username===u&&x.password===p);
+    if(!acct){Toast.show('Identifiants incorrects');return;}
+    State.user=acct;State.userRole=acct.role;
+    if(acct.role==='admin'){Admin.init();Router.go('admin');}
+    else{Kds.init();Router.go('kds');}
+  },
+  logout(){
+    State.user=null;State.userRole=null;State.cart=[];State.activeOrderId=null;
+    ['loginEmail','loginPwd','staffUser','staffPwd'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    Router.go('landing');
+  }
+};
+
+/* ── CLIENT ── */
+const Client={
+  confirmTable(){
+    const num=document.getElementById('tableNumInput').value.trim();
+    if(!num){Toast.show('Numéro de table requis');return;}
+    State.table=parseInt(num);
+    const disp=document.getElementById('tableNumDisplay');
+    if(disp)disp.textContent=num;
+    Router.go('menu');
+    setTimeout(()=>Client.showWelcome(),600);
+  },
+  showWelcome(){Modal.open('mdWelcome');},
+  closeWelcome(){Modal.close('mdWelcome');Client.renderMenu();},
+
+  renderMenu(){
+    const grid=document.getElementById('menuGrid');
+    if(!grid)return;
+    grid.innerHTML='';
+    State.menu.filter(item=>item.cat===State.currentCat).forEach(item=>{
+      const card=document.createElement('div');
+      card.className='glass-card rounded-2xl p-4 cursor-pointer';
+      card.onclick=()=>Client.showProduct(item);
+      card.innerHTML=`
+        <img src="${item.img}" class="plate-img" alt="${item.name}" style="width:100%;height:160px;object-fit:contain;margin-bottom:8px" loading="lazy" onerror="this.style.display='none'">
+        <span style="font-size:10px;padding:3px 10px;border-radius:100px;font-weight:700;${item.bio?'background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)':'background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.25)'}">${item.bio?'🌱 BIO':item.badge}</span>
+        <div style="color:#fff;font-weight:800;margin:8px 0 4px;font-size:15px">${item.name}</div>
+        <div style="color:var(--ink-soft);font-size:12px;margin-bottom:10px;line-height:1.5">${item.desc}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#60a5fa;font-weight:900;font-size:17px">${item.price.toFixed(2)}€</span>
+          <span style="font-size:20px">+</span>
+        </div>`;
+      grid.appendChild(card);
+    });
+  },
+
+  filter(cat,el){
+    State.currentCat=cat;
+    document.querySelectorAll('.category-pill').forEach(p=>p.classList.remove('active'));
+    el.classList.add('active');
+    Client.renderMenu();
+  },
+
+  showProduct(item){
+    const mdBody=document.getElementById('mdProductBody');
+    mdBody.innerHTML=`
+      <div class="modal-close" onclick="Modal.close('mdProduct')">✕</div>
+      <img src="${item.img}" style="width:100%;height:200px;object-fit:contain;margin-bottom:16px" onerror="this.style.display='none'">
+      <h3 style="color:#fff;font-size:18px;font-weight:900;margin-bottom:4px">${item.name}</h3>
+      <p style="color:var(--ink-soft);font-size:13px;margin-bottom:16px;line-height:1.7">${item.desc}</p>
+      <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+        ${item.bio?'<span style="font-size:10px;background:rgba(34,197,94,.2);color:#4ade80;padding:4px 10px;border-radius:100px;border:1px solid rgba(34,197,94,.4)">🌱 BIO</span>':''}
+        <span style="font-size:10px;background:rgba(59,130,246,.15);color:#93c5fd;padding:4px 10px;border-radius:100px;border:1px solid rgba(59,130,246,.3)">${item.badge}</span>
+      </div>
+      <button onclick="Client.addItem(${item.id})" class="btn-neo btn-blue w-full">
+        Ajouter au panier — ${item.price.toFixed(2)}€
+      </button>`;
+    Modal.open('mdProduct');
+  },
+
+  addItem(productId){
+    const product=State.menu.find(p=>p.id===productId);
+    if(!product)return;
+    const existing=State.cart.find(c=>c.id===productId);
+    if(existing){existing.qty=(existing.qty||1)+1;}
+    else{State.cart.push({...product,qty:1});}
+    Cart.update();
+    Modal.close('mdProduct');
+    Toast.show('✅ Ajouté au panier');
+  },
+
+  plateArrived(){State.activeOrderId=null;Router.go('enjoy');Avatar.say('Bon appétit ! 🍽️',4000);},
+  askForBill(){Modal.open('mdBillReason');},
+  sendBillRequest(){
+    const msg=document.getElementById('billMsg').value||'Addition s\'il vous plaît';
+    Sync.send('CALL',{id:'bill_'+Date.now(),table:State.table,type:'bill',message:msg,time:new Date().toLocaleTimeString()});
+    Modal.close('mdBillReason');
+    Toast.show('💳 Demande d\'addition envoyée');
+  },
+  onStatusUpdate(status){
+    if(status==='ready')Router.go('cooking');
+    if(status==='served')Client.plateArrived();
+  },
+
+  _runInterval:null,_cookInterval:null,
+  startRunning(){
+    let sec=120;
+    clearInterval(this._runInterval);
+    this._runInterval=setInterval(()=>{
+      const m=Math.floor(sec/60);const s=sec%60;
+      const rt=document.getElementById('runTimer');const rp=document.getElementById('runProgress');
+      if(rt)rt.textContent=m+':'+(s<10?'0':'')+s;
+      if(rp)rp.style.width=((120-sec)/120*100)+'%';
+      sec--;
+      if(sec<0){clearInterval(this._runInterval);Router.go('cooking');Client.startCooking();}
+    },1000);
+  },
+  startCooking(){
+    const total=State.cookMins*60;let sec=total;
+    const arc=document.getElementById('cookArc');
+    clearInterval(this._cookInterval);
+    this._cookInterval=setInterval(()=>{
+      const m=Math.floor(sec/60);const s=sec%60;
+      const ct=document.getElementById('cookTime');
+      if(ct)ct.textContent=m+':'+(s<10?'0':'')+s;
+      if(arc)arc.style.strokeDashoffset=(289*(sec/total))+'';
+      sec--;
+      if(sec<0){clearInterval(this._cookInterval);Avatar.say('Ton plat arrive ! Bon appétit 🍽️');}
+    },1000);
+  }
+};
+
+/* ── CART ── */
+const Cart={
+  update(){
+    const count=State.cart.reduce((s,c)=>s+(c.qty||1),0);
+    const total=State.cart.reduce((s,c)=>s+c.price*(c.qty||1),0);
+    const cc=document.getElementById('cartCount');const ct=document.getElementById('cartTotal');
+    if(cc)cc.textContent=count;
+    if(ct)ct.textContent=total.toFixed(2)+'€';
+  },
+  getTotal(){return State.cart.reduce((s,c)=>s+c.price*(c.qty||1),0);},
+  validate(){
+    if(State.cart.length===0){Toast.show('Panier vide — choisis d\'abord un plat 🍽️');return;}
+    const orderId='ord_'+Date.now();
+    const order={id:orderId,table:State.table,user:State.user?.email||'guest',items:[...State.cart],total:Cart.getTotal(),status:'pending',timestamp:new Date().toISOString()};
+    State.orders.push(order);
+    State.activeOrderId=orderId;
+    Sync.send('ORDER',order);
+    State.cart=[];
+    Cart.update();
+    Router.go('running');
+    Client.startRunning();
+  }
+};
+
+/* ── WAITER ── */
+const Waiter={
+  open(){
+    const grid=document.getElementById('waiterQuickGrid');
+    if(grid){
+      grid.innerHTML=State.quickCalls.map(q=>`<button onclick="Waiter.quickSend('${q.txt.replace(/'/g,'\\\'')}')" style="padding:12px;border-radius:12px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all .2s;text-align:left" onmouseover="this.style.background='rgba(59,130,246,.25)'" onmouseout="this.style.background='rgba(59,130,246,.1)'">${q.emo} ${q.txt}</button>`).join('');
+    }
+    Modal.open('mdWaiter');
+  },
+  close(){Modal.close('mdWaiter');},
+  quickSend(reason){
+    const ta=document.getElementById('waiterCustom');
+    if(ta)ta.value=(ta.value?ta.value+' + ':'')+reason;
+  },
+  send(){
+    const txt=document.getElementById('waiterCustom')?.value.trim()||'Assistance requise';
+    const callData={id:'call_'+Date.now(),table:State.table,message:txt,time:new Date().toLocaleTimeString()};
+    State.calls.push(callData);
+    Sync.send('CALL',callData);
+    Waiter.close();
+    const ta=document.getElementById('waiterCustom');if(ta)ta.value='';
+    Toast.show('🛎️ Serveur appelé !');
+    Avatar.say('Le serveur arrive dans une minute 🏃',4000);
+  }
+};
+
+/* ── KDS ── */
+const Kds={
+  _interval:null,
+  init(){
+    Kds.render();Kds.renderCalls();
+    clearInterval(this._interval);
+    this._interval=setInterval(()=>{Kds.render();Kds.renderCalls();},5000);
+    const lbl=document.getElementById('kdsRoleLabel');
+    if(lbl)lbl.textContent=State.userRole==='cuisine'?'CUISINE':'BAR';
+  },
+  render(){
+    const grid=document.getElementById('kdsGrid');if(!grid)return;
+    const active=State.orders.filter(o=>o.status!=='served');
+    const done=State.orders.filter(o=>o.status==='served').length;
+    const ka=document.getElementById('kdsActive');const kd=document.getElementById('kdsDone');
+    if(ka)ka.textContent=active.length;
+    if(kd)kd.textContent=done;
+    grid.innerHTML=active.map(o=>`
+      <div class="kds-ticket${o.status==='urgent'?' urgent':''}">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-weight:900;color:#fff;font-size:16px">Table ${o.table}</span>
+          <span style="font-size:11px;color:var(--ink-muted)">${o.timestamp.slice(11,16)}</span>
+        </div>
+        ${o.items.map(i=>`<div style="font-size:12px;color:var(--ink-soft);margin:4px 0">${i.qty||1}x ${i.name}</div>`).join('')}
+        <div style="color:#60a5fa;font-weight:900;margin:10px 0 12px;font-size:14px">${o.total.toFixed(2)}€</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="Kds.markDone('${o.id}')" class="btn-neo" style="flex:1;padding:8px;font-size:12px">✓ Prêt</button>
+          <button onclick="Kds.markServed('${o.id}')" class="btn-neo btn-blue" style="flex:1;padding:8px;font-size:12px">🍽️ Servi</button>
+        </div>
+      </div>`).join('');
+  },
+  renderCalls(){
+    const grid=document.getElementById('kdsCalls');if(!grid)return;
+    grid.innerHTML=State.calls.map(c=>`
+      <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);padding:12px;border-radius:14px;color:var(--ink)">
+        <div style="font-weight:700;color:#fff">Table ${c.table} — ${c.time||''}</div>
+        <div style="font-size:12px;margin-top:4px;color:var(--ink-soft)">${c.message}</div>
+        <button onclick="Kds.clearCall('${c.id}')" style="margin-top:8px;font-size:11px;padding:6px 10px;border-radius:8px;background:rgba(239,68,68,.2);color:#fff;border:none;cursor:pointer;font-family:inherit">✓ Fait</button>
+      </div>`).join('');
+  },
+  markDone(id){const o=State.orders.find(x=>x.id===id);if(o){o.status='ready';Sync.send('STATUS',{id,status:'ready'});Kds.render();}},
+  markServed(id){const o=State.orders.find(x=>x.id===id);if(o){o.status='served';Sync.send('STATUS',{id,status:'served'});Kds.render();}},
+  clearCall(id){State.calls=State.calls.filter(c=>c.id!==id);Kds.renderCalls();},
+  ping(){try{new Audio('data:audio/wav;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIBAAAAAA==').play();}catch(e){}}
+};
+
+/* ── ADMIN ── */
+const Admin={
+  init(){Admin.renderMenu();Admin.renderOrders();Admin.renderUsers();Admin.renderOffers();
+    const sc=document.getElementById('sCookMin');if(sc)sc.value=State.cookMins;
+    const sr=document.getElementById('sRestoName');if(sr)sr.value=State.restoName;
+    const sp=document.getElementById('sPatronMail');if(sp)sp.value=State.patronMail;
+  },
+  refresh(){Admin.renderOrders();Admin.renderCalls();},
+  tab(t,el){
+    document.querySelectorAll('.adm-tab').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('[id^="adm-"]').forEach(x=>x.classList.add('hidden'));
+    const target=document.getElementById('adm-'+t);if(target)target.classList.remove('hidden');
+    if(t==='orders')Admin.renderOrders();
+    if(t==='users')Admin.renderUsers();
+    if(t==='menu')Admin.renderMenu();
+    if(t==='offers')Admin.renderOffers();
+  },
+  renderMenu(){
+    const grid=document.getElementById('admMenuGrid');if(!grid)return;
+    grid.innerHTML=State.menu.map(p=>`
+      <div class="dark-card">
+        <img src="${p.img}" alt="${p.name}" style="width:100%;height:120px;object-fit:contain;border-radius:12px;margin-bottom:12px" onerror="this.style.display='none'">
+        <h4 style="color:#fff;font-weight:800;margin:0 0 4px">${p.name}</h4>
+        <p style="color:var(--ink-soft);font-size:12px;margin:0 0 8px">${p.desc}</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="color:#60a5fa;font-weight:900">${p.price.toFixed(2)}€</span>
+          <span style="font-size:11px;${p.bio?'color:#22c55e':'color:var(--ink-muted)'}">${p.bio?'🌱 BIO':'Standard'}</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="Admin.editProduct(${p.id})" class="btn-neo ghost" style="flex:1;padding:8px;font-size:12px">Éditer</button>
+          <button onclick="Admin.deleteProduct(${p.id})" class="btn-neo btn-danger" style="flex:1;padding:8px;font-size:12px">Supprimer</button>
+        </div>
+      </div>`).join('');
+  },
+  renderOffers(){
+    const list=document.getElementById('admOffersList');if(!list)return;
+    list.innerHTML=State.offers.map(o=>`
+      <div class="dark-card">
+        <h4 style="color:#fff;font-weight:800;margin:0 0 4px">${o.title}</h4>
+        <p style="color:var(--ink-soft);font-size:12px;margin:0 0 8px">${o.desc}</p>
+        <span style="color:#60a5fa;font-weight:900">${o.price.toFixed(2)}€</span>
+      </div>`).join('');
+  },
+  renderOrders(){
+    const list=document.getElementById('admOrdersList');if(!list)return;
+    let ca=0,count=0,served=0;
+    State.orders.forEach(o=>{ca+=o.total;count++;if(o.status==='served')served++;});
+    const avg=count>0?ca/count:0;
+    const sCA=document.getElementById('sCA');const sO=document.getElementById('sOrders');const sS=document.getElementById('sServed');const sA=document.getElementById('sAvg');
+    if(sCA)sCA.textContent=ca.toFixed(2)+'€';if(sO)sO.textContent=count;if(sS)sS.textContent=served;if(sA)sA.textContent=avg.toFixed(2)+'€';
+    list.innerHTML=State.orders.length===0?'<p style="color:var(--ink-muted);text-align:center;padding:40px">Aucune commande pour l\'instant</p>':State.orders.map(o=>`
+      <div class="dark-card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="color:#fff;font-weight:800">Table ${o.table}</span>
+          <span style="font-size:11px;padding:3px 8px;border-radius:8px;background:${o.status==='pending'?'rgba(249,115,22,.2)':o.status==='ready'?'rgba(34,197,94,.2)':'rgba(59,130,246,.2)'};color:${o.status==='pending'?'#f59e0b':o.status==='ready'?'#22c55e':'#60a5fa'}">${o.status}</span>
+        </div>
+        <p style="color:var(--ink-soft);font-size:12px;margin:6px 0">${o.items.map(i=>(i.qty||1)+'x '+i.name).join(' • ')}</p>
+        <div style="color:#60a5fa;font-weight:900;margin-top:8px">${o.total.toFixed(2)}€</div>
+      </div>`).join('');
+  },
+  renderUsers(){
+    const list=document.getElementById('admUsersList');if(!list)return;
+    list.innerHTML=State.users.map(u=>`
+      <div class="dark-card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="color:#fff;font-weight:800">${u.name}</span>
+          <span style="font-size:10px;padding:4px 10px;border-radius:8px;background:rgba(99,102,241,.2);color:#c7d2fe">${u.role}</span>
+        </div>
+        <p style="color:var(--ink-muted);font-size:11px;margin:4px 0">@${u.username}</p>
+        <button onclick="Admin.deleteUser('${u.id}')" class="btn-neo btn-danger w-full" style="margin-top:10px;padding:8px;font-size:12px">Supprimer</button>
+      </div>`).join('');
+  },
+  renderCalls(){Kds.renderCalls&&Kds.renderCalls();},
+  newProduct(){
+    const name=prompt('Nom du plat:');if(!name)return;
+    const cat=prompt('Catégorie (entrees/plats/desserts/boissons):');
+    const price=parseFloat(prompt('Prix (ex: 12.50):'));
+    if(!cat||isNaN(price))return;
+    const id=Math.max(...State.menu.map(p=>p.id||0),100)+1;
+    State.menu.push({id,cat,name,price,desc:'',img:'',badge:'Nouveau',bc:'bg-blue-100 text-blue-600',bio:false});
+    Sync.send('MENU',State.menu);State.save();Admin.renderMenu();
+    Toast.show('✅ Plat ajouté');
+  },
+  editProduct(id){
+    const p=State.menu.find(x=>x.id===id);if(!p)return;
+    const newPrice=parseFloat(prompt('Nouveau prix:',p.price));
+    if(!isNaN(newPrice)){p.price=newPrice;Sync.send('MENU',State.menu);State.save();Admin.renderMenu();}
+  },
+  deleteProduct(id){
+    if(!confirm('Supprimer ce plat ?'))return;
+    State.menu=State.menu.filter(p=>p.id!==id);
+    Sync.send('MENU',State.menu);State.save();Admin.renderMenu();
+    Toast.show('✅ Plat supprimé');
+  },
+  newUser(){
+    const username=prompt('Identifiant:');const pwd=prompt('Mot de passe:');const role=prompt('Rôle (admin/bar/cuisine):');
+    if(!username||!pwd||!role)return;
+    State.users.push({id:'u'+Date.now(),username,password:pwd,role,name:username});
+    State.save();Admin.renderUsers();Toast.show('✅ Compte créé');
+  },
+  deleteUser(id){
+    if(!confirm('Supprimer ce compte ?'))return;
+    State.users=State.users.filter(u=>u.id!==id);State.save();Admin.renderUsers();
+  },
+  newOffer(){
+    const title=prompt('Titre offre:');const desc=prompt('Description:');const price=parseFloat(prompt('Prix:'));
+    if(!title||!desc||isNaN(price))return;
+    State.offers.push({id:'of'+Date.now(),title,desc,price,active:true});State.save();Admin.renderOffers();
+    Toast.show('✅ Offre créée');
+  },
+  saveSettings(){
+    State.cookMins=parseInt(document.getElementById('sCookMin')?.value)||15;
+    State.restoName=document.getElementById('sRestoName')?.value||'NeoBistro';
+    State.patronMail=document.getElementById('sPatronMail')?.value||'patron@neobistro.fr';
+    State.save();Toast.show('⚙️ Paramètres sauvegardés');
+  }
+};
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded',()=>{
+  State.load();
+  setTimeout(()=>{
+    document.getElementById('loadingScreen').classList.add('hidden');
+    setTimeout(()=>{const ls=document.getElementById('loadingScreen');if(ls)ls.style.display='none';},500);
+  },900);
+  Avatar.say('Salut ! Je suis Léo, ton serveur virtuel 🍽️',5000);
+});
+</script>
+</body>
+</html>
